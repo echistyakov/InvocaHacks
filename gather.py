@@ -7,7 +7,7 @@ Usage:
 ./gather.py [id of reddit post from URL] [outfile]
 
 Format of printed comments:
-[hours after post] [minutes after post] [post body]
+[minutes after post] [post body]
 '''
 
 
@@ -26,7 +26,6 @@ def run_script():
 
     client = praw.Reddit(user_agent="some Agent")
     submission = client.get_submission(submission_id=submission_id)
-    #comment out the following line if the number of comments is <200
     submission.replace_more_comments(limit=None, threshold=0)
 
     post_created_time = datetime.datetime.fromtimestamp(submission.created_utc)
@@ -40,8 +39,9 @@ def run_script():
 
             if is_comment_valid(c.body):
                 c_body = c.body.replace('\n', ' ')
+                hours_and_minutes = str(r_time.hours * 60 + r_time.minutes)
 
-                line = str(r_time.hours) + " " + str(r_time.minutes) + " " + c_body.encode("ascii", "ignore") + "\n"
+                line = str(hours_and_minutes) + " " + c_body.encode("ascii", "ignore") + "\n"
                 out_file.write(line)
 
     out_file.close()
