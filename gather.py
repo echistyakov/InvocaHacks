@@ -12,7 +12,7 @@ Format of printed comments:
 
 
 def is_comment_valid(comment):
-	if comment.find("http") == -1 and len(comment) > 1:
+	if comment.find("http") == -1 and len(comment) > 1 and comment.find("[deleted]") == -1 and comment.find("[removed]") == -1:
 		return True
 	else:
 		return False
@@ -26,9 +26,12 @@ def run_script():
 
     client = praw.Reddit(user_agent="some Agent")
     submission = client.get_submission(submission_id=submission_id)
+	#comment out the following line if the number of comments is <200
+    submission.replace_more_comments(limit=None, threshold=0)
 
     post_created_time = datetime.datetime.fromtimestamp(submission.created_utc)
     all_comments = praw.helpers.flatten_tree(submission.comments)
+    print "Total Comments: ", len(all_comments)
 
     for c in all_comments:
         if isinstance(c, praw.objects.Comment):
@@ -37,7 +40,6 @@ def run_script():
 
             if is_comment_valid(c.body):
                 c_body = c.body.replace('\n', ' ')
-                c_body.encode('ascii', 'ignore')
 
                 line = str(r_time.hours) + " " + str(r_time.minutes) + " " + c_body.encode("ascii", "ignore") + "\n"
                 out_file.write(line)
