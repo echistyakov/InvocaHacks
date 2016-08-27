@@ -26,7 +26,7 @@ def run_script():
 
     client = praw.Reddit(user_agent="some Agent")
     submission = client.get_submission(submission_id=submission_id)
-	#comment out the following line if the number of comments is <200
+    #comment out the following line if the number of comments is <200
     submission.replace_more_comments(limit=None, threshold=0)
 
     post_created_time = datetime.datetime.fromtimestamp(submission.created_utc)
