@@ -1,34 +1,46 @@
 import scala.io.Source
-import breeze.linalg._
-import breeze.plot._
+import scalax.chart.api._
 
-object HelloWorld{
+object HelloWorld {
   def main(args: Array[String]) {
+    val ret = read_data_into_list("test.txt")
+
+    val positivity_func = (list: List[(Double,Double,Double,Double,Double)]) => {
+      list.map( x => (x._1, x._3))
+    }
+
+    plot_xy_graph(ret, positivity_func, "positivityIndex.png")
+
+  }
+
+  def plot_xy_graph(data: List[(Double,Double,Double,Double,Double)],
+    xy_convert: List[(Double,Double,Double,Double,Double)] => List[(Double,Double)],
+    name: String) =
+  {
+    val xy_pairs = xy_convert(data)
+    val chart = XYLineChart(xy_pairs)
+    chart.saveAsPNG("./" + name)
+  }
 
 
-     //time_vs_rating("sample.txt")
-   }
+  def read_data_into_list(filename: String): List[(Double,Double,Double,Double,Double)] = {
+    var a : List[(Double,Double,Double,Double,Double)] = List()
+    for (line <- Source.fromFile(filename).getLines()) {
+      // minutes-rate-conf-conf-conf
+      val split_string = line.split(" ")
 
-   def time_vs_rating(filename: String){
-     for (line <- Source.fromFile(filename).getLines()) {
-       val split_string = line.split(" ")
-       val time = split_string(0)
-       val rating = split_string(1)
+      val minutes = split_string(0).toDouble
+      val review = split_string(1).toDouble
+      val pos_conf = split_string(2).toDouble
+      val neu_conf = split_string(3).toDouble
+      val neg_conf = split_string(4).toDouble
 
-       println("time = " + time)
-       println("rating = " + rating)
-     }
+      a = a:+(minutes, review, pos_conf, neu_conf, neg_conf)
+    }
+    return a
+  }
 
-     val f = Figure()
-     val p = f.subplot(0)
-     val x = linspace(0.0,10.0)
-     p += plot(x, x :^ 2.0)
-     p += plot(x, x :^ 3.0, '.')
-
-
-     p.xlabel = "Time"
-     p.ylabel = "y axis"
-     f.saveas("lines.png")
-
-   }
+  def print_double_tuple_arr(list: List[(Double, Double, Double, Double, Double)]) = {
+    list.foreach( a => { println("(" + a._1 + ", " + a._2 + ")") } )
+  }
 }
